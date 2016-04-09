@@ -14,26 +14,6 @@ library("wordcloud")
 library("ggplot2")
 library("gridExtra")
 library("stringr")
-for( i in 1:30 )
-{
-	ch <- toString(i)
-	ch <- paste(ch,".csv",sep="")
-	setwd('Bahubali')
-	if(i==1)
-		B <- read.csv(ch,sep=',')
-	else
-		B <- rbind(B, read.csv(ch,sep=','))
-	setwd('..')
-	setwd('Bhajrangi')
-	if(i==1)
-		Bb <- read.csv(ch,sep=',')
-	else
-		Bb <- rbind(Bb, read.csv(ch,sep=','))
-	setwd('..')
-}
-# B for Bahubali and Bb for BhajrangiBhaijaan
-B$text<-iconv(B$text, 'UTF-8', 'ASCII')
-Bb$text <- iconv(Bb$text, 'UTF-8', 'ASCII')
 
 CleanTweets<-function(tweets)
   {
@@ -51,7 +31,7 @@ CleanTweets<-function(tweets)
     
   }
 
-  score.sentiment = function(sentences, pos.words, neg.words)
+  score.sentiment = function(sentences,pos.words, neg.words)
   {
        
     # we got a vector of sentences. plyr will handle a list
@@ -80,7 +60,6 @@ CleanTweets<-function(tweets)
       # we just want a TRUE/FALSE:
       pos.matches = !is.na(pos.matches)
       neg.matches = !is.na(neg.matches)
-      
       # and conveniently enough, TRUE/FALSE will be treated as 1/0 by sum():
       score = sum(pos.matches) - sum(neg.matches)
       
@@ -91,25 +70,9 @@ CleanTweets<-function(tweets)
     return(scores.df)
   }
   
-sentimentalanalysis<-function(entitytext){
-   positivewords=readLines("positive.txt")
-   negativewords=readLines("negative.txt")
+sentimentalanalysis<-function(entitytext,textLoc){
+   positivewords=readLines(file.path(textLoc,"positive.txt"))
+   negativewords=readLines(file.path(textLoc,"negative.txt"))
    entityscore = score.sentiment(CleanTweets(entitytext),positivewords,negativewords)
 }   
 
-entityscores1<-sentimentalanalysis(B$text)
-entityscores2<-sentimentalanalysis(Bb$text)
-
-finalsum1 <- sum(entityscores1$score)
-finalsum2 <- sum(entityscores2$score)
-print(finalsum1)
-print(' was the score got by Bahubali')
-print(finalsum2)
-print(' was the score got by Bhajrangi Bhaijaan')
-if(finalsum1 > finalsum2)
-{
-	print('as of this sample, Bahubali is trending.')
-}else
-{
-	print('as of this sample, Bhajrangi Bhaijaan is trending.')
-}
